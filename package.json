@@ -1,0 +1,19 @@
+{
+  "name": "jenkins-deploy-action",
+  "version": "1.0.0",
+  "description": "Trigger jenkins deploy",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/action.js -o dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.hu"
+  },
+  "author": "Kulifay Zsolt",
+  "license": "ISC",
+  "devDependencies": {
+    "@vercel/ncc": "^0.28.6"
+  }
+}
