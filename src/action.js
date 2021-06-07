@@ -17,7 +17,6 @@ async function run() {
     console.log(BRANCH);
 
 
-
     const { context = {} } = github;
     const { pull_request } = context.payload;
 
