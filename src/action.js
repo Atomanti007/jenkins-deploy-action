@@ -9,7 +9,8 @@ async function run() {
     const message = core.getInput('message') || 'Thank you!';
     const searchTerm = core.getInput('searchTerm') || 'thank you';
 
-    console.log(core.getInput(`GITHUB_REPOSITORY`));
+    console.log('RUN');
+    console.log(core.getInput('repository'));
 
 
 
@@ -17,7 +18,7 @@ async function run() {
     const { pull_request } = context.payload;
 
     if ( !pull_request ) {
-        throw new Error('Could not find pull request!')
+        throw new Error('Could not find pull request! ')
     };
 
     console.log(`Found pull request: ${pull_request.number}`);

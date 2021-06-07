@@ -9,6 +9,10 @@ inputs:
   TENOR_TOKEN:
     description: 'Tenor API token'
     required: false
+  repository:
+    description: 'Repository name with owner. For example, actions/checkout'
+    default: ${{ github.repository }}
+    required: false
 
 runs:
   using: 'node12'
