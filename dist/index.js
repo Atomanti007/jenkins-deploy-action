@@ -3900,6 +3900,131 @@ exports.Deprecation = Deprecation;
 
 /***/ }),
 
+/***/ 437:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/* @flow */
+/*::
+
+type DotenvParseOptions = {
+  debug?: boolean
+}
+
+// keys and values from src
+type DotenvParseOutput = { [string]: string }
+
+type DotenvConfigOptions = {
+  path?: string, // path to .env file
+  encoding?: string, // encoding of .env file
+  debug?: string // turn on logging for debugging purposes
+}
+
+type DotenvConfigOutput = {
+  parsed?: DotenvParseOutput,
+  error?: Error
+}
+
+*/
+
+const fs = __nccwpck_require__(747)
+const path = __nccwpck_require__(622)
+const os = __nccwpck_require__(87)
+
+function log (message /*: string */) {
+  console.log(`[dotenv][DEBUG] ${message}`)
+}
+
+const NEWLINE = '\n'
+const RE_INI_KEY_VAL = /^\s*([\w.-]+)\s*=\s*(.*)?\s*$/
+const RE_NEWLINES = /\\n/g
+const NEWLINES_MATCH = /\r\n|\n|\r/
+
+// Parses src into an Object
+function parse (src /*: string | Buffer */, options /*: ?DotenvParseOptions */) /*: DotenvParseOutput */ {
+  const debug = Boolean(options && options.debug)
+  const obj = {}
+
+  // convert Buffers before splitting into lines and processing
+  src.toString().split(NEWLINES_MATCH).forEach(function (line, idx) {
+    // matching "KEY' and 'VAL' in 'KEY=VAL'
+    const keyValueArr = line.match(RE_INI_KEY_VAL)
+    // matched?
+    if (keyValueArr != null) {
+      const key = keyValueArr[1]
+      // default undefined or missing values to empty string
+      let val = (keyValueArr[2] || '')
+      const end = val.length - 1
+      const isDoubleQuoted = val[0] === '"' && val[end] === '"'
+      const isSingleQuoted = val[0] === "'" && val[end] === "'"
+
+      // if single or double quoted, remove quotes
+      if (isSingleQuoted || isDoubleQuoted) {
+        val = val.substring(1, end)
+
+        // if double quoted, expand newlines
+        if (isDoubleQuoted) {
+          val = val.replace(RE_NEWLINES, NEWLINE)
+        }
+      } else {
+        // remove surrounding whitespace
+        val = val.trim()
+      }
+
+      obj[key] = val
+    } else if (debug) {
+      log(`did not match key and value when parsing line ${idx + 1}: ${line}`)
+    }
+  })
+
+  return obj
+}
+
+function resolveHome (envPath) {
+  return envPath[0] === '~' ? path.join(os.homedir(), envPath.slice(1)) : envPath
+}
+
+// Populates process.env from .env file
+function config (options /*: ?DotenvConfigOptions */) /*: DotenvConfigOutput */ {
+  let dotenvPath = path.resolve(process.cwd(), '.env')
+  let encoding /*: string */ = 'utf8'
+  let debug = false
+
+  if (options) {
+    if (options.path != null) {
+      dotenvPath = resolveHome(options.path)
+    }
+    if (options.encoding != null) {
+      encoding = options.encoding
+    }
+    if (options.debug != null) {
+      debug = true
+    }
+  }
+
+  try {
+    // specifying an encoding returns a string instead of a buffer
+    const parsed = parse(fs.readFileSync(dotenvPath, { encoding }), { debug })
+
+    Object.keys(parsed).forEach(function (key) {
+      if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
+        process.env[key] = parsed[key]
+      } else if (debug) {
+        log(`"${key}" is already defined in \`process.env\` and will not be overwritten`)
+      }
+    })
+
+    return { parsed }
+  } catch (e) {
+    return { error: e }
+  }
+}
+
+module.exports.config = config
+module.exports.parse = parse
+
+
+/***/ }),
+
 /***/ 287:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -6149,25 +6274,55 @@ module.exports = require("zlib");;
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+__nccwpck_require__(437).config();
+const fetch = __nccwpck_require__(467);
 const core = __nccwpck_require__(186);
 const github = __nccwpck_require__(438);
 
 async function run() {
-    console.log('Hello, world!');
     const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+    const TENOR_TOKEN = core.getInput('TENOR_TOKEN') || process.env.TENOR_TOKEN;
+    const message = core.getInput('message') || 'Thank you!';
+    const searchTerm = core.getInput('searchTerm') || 'thank you';
 
-    const octokit = github.getOctokit(GITHUB_TOKEN);
+    if ( typeof TENOR_TOKEN !== 'string' ) {
+        throw new Error('Invalid TENOR_TOKEN: did you forget to set it in your action config?');
+    }
+
+    if ( typeof GITHUB_TOKEN !== 'string' ) {
+        throw new Error('Invalid GITHUB_TOKEN: did you forget to set it in your action config?');
+    }
+
+    const randomPos = Math.round(Math.random() * 1000);
+    const url = `https://api.tenor.com/v1/search?q=${encodeURIComponent(searchTerm)}&pos=${randomPos}&limit=1&media_filter=minimal&contentfilter=high`
+
+    console.log(`Searching Tenor: ${url}`)
+
+    const response = await fetch(`${url}&key=${TENOR_TOKEN}`);
+    const { results } = await response.json();
+    const gifUrl = results[0].media[0].tinygif.url;
+
+    console.log(`Found gif from Tenor: ${gifUrl}`);
 
     const { context = {} } = github;
     const { pull_request } = context.payload;
 
+    if ( !pull_request ) {
+        throw new Error('Could not find pull request!')
+    };
+
+    console.log(`Found pull request: ${pull_request.number}`);
+
+    const octokit = github.getOctokit(GITHUB_TOKEN)
+
     await octokit.issues.createComment({
         ...context.repo,
         issue_number: pull_request.number,
-        body: 'Thank you for submitting a pull request! We will try to review this as soon as we can.'
+        body: `${message}\n\n<img src="${gifUrl}" alt="${searchTerm}" />`
     });
 }
-run();
+
+run().catch(e => core.setFailed(e.message));
 
 })();
 
