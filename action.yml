@@ -1,6 +1,6 @@
 name: 'Thank You Action'
 description: 'Say "Thank You" to new pull requests'
-author: '[Your Name]'
+author: 'Kulifay Zsolt'
 
 inputs:
   GITHUB_TOKEN:
