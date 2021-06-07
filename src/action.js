@@ -9,7 +9,8 @@ async function run() {
     const message = core.getInput('message') || 'Thank you!';
     const searchTerm = core.getInput('searchTerm') || 'thank you';
 
-    console.log(core.getInput(`GITHUB_REPOSITORY`));
+    console.log('RUN');
+    console.log(core.getInput('repository'));
 
 
 
