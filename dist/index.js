@@ -5998,6 +5998,14 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 153:
+/***/ ((module) => {
+
+module.exports = eval("require")("dotenv");
+
+
+/***/ }),
+
 /***/ 877:
 /***/ ((module) => {
 
@@ -6149,25 +6157,55 @@ module.exports = require("zlib");;
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+__nccwpck_require__(153).config();
+const fetch = __nccwpck_require__(467);
 const core = __nccwpck_require__(186);
 const github = __nccwpck_require__(438);
 
 async function run() {
-    console.log('Hello, world!');
     const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+    const TENOR_TOKEN = core.getInput('TENOR_TOKEN') || process.env.TENOR_TOKEN;
+    const message = core.getInput('message') || 'Thank you!';
+    const searchTerm = core.getInput('searchTerm') || 'thank you';
 
-    const octokit = github.getOctokit(GITHUB_TOKEN);
+    if ( typeof TENOR_TOKEN !== 'string' ) {
+        throw new Error('Invalid TENOR_TOKEN: did you forget to set it in your action config?');
+    }
+
+    if ( typeof GITHUB_TOKEN !== 'string' ) {
+        throw new Error('Invalid GITHUB_TOKEN: did you forget to set it in your action config?');
+    }
+
+    const randomPos = Math.round(Math.random() * 1000);
+    const url = `https://api.tenor.com/v1/search?q=${encodeURIComponent(searchTerm)}&pos=${randomPos}&limit=1&media_filter=minimal&contentfilter=high`
+
+    console.log(`Searching Tenor: ${url}`)
+
+    const response = await fetch(`${url}&key=${TENOR_TOKEN}`);
+    const { results } = await response.json();
+    const gifUrl = results[0].media[0].tinygif.url;
+
+    console.log(`Found gif from Tenor: ${gifUrl}`);
 
     const { context = {} } = github;
     const { pull_request } = context.payload;
 
+    if ( !pull_request ) {
+        throw new Error('Could not find pull request!')
+    };
+
+    console.log(`Found pull request: ${pull_request.number}`);
+
+    const octokit = github.getOctokit(GITHUB_TOKEN)
+
     await octokit.issues.createComment({
         ...context.repo,
         issue_number: pull_request.number,
-        body: 'Thank you for submitting a pull request! We will try to review this as soon as we can.'
+        body: `${message}\n\n<img src="${gifUrl}" alt="${searchTerm}" />`
     });
 }
-run();
+
+run().catch(e => core.setFailed(e.message));
 
 })();
 
