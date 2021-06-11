@@ -9,18 +9,23 @@ async function run() {
     const message = core.getInput('message') || 'Thank you!';
     const searchTerm = core.getInput('searchTerm') || 'thank you';
 
-    console.log('RUN');
-    console.log(core.getInput('repository'));
+    const REPOSITORY = core.getInput('repository');
+    const BRANCH = core.getInput('branch') || 'master';
 
+    console.log('RUN');
+    console.log(REPOSITORY);
+    console.log(BRANCH);
 
 
     const { context = {} } = github;
     const { pull_request } = context.payload;
 
     if ( !pull_request ) {
-        throw new Error('Could not find pull request! ')
+        throw new Error('Could not find pull request!')
     };
 
+    console.log(JSON.stringify(github));
+    console.log(JSON.stringify(pull_request));
     console.log(`Found pull request: ${pull_request.number}`);
 
 }
