@@ -14,14 +14,14 @@ const PARAMETERS = core.getInput('parameter');
 const WAIT = core.getInput('wait');
 const TIMEOUT = core.getInput('timeout');
 
-const REPOSITORY = core.getInput('repository');
-const BRANCH = core.getInput('branch') || 'main';
+let REPOSITORY = core.getInput('repository');
+let branch;
 
-function run() {
+function githubSettings() {
 
     console.log('RUN');
     console.log(REPOSITORY);
-    console.log(BRANCH);
+    console.log(branch);
 
 
     const {context = {}} = github;
@@ -32,7 +32,7 @@ function run() {
         throw new Error('Could not find pull request!');
     }
 
-    console.log(pull_request.head.ref);
+    branch = pull_request.head.ref;
 
     console.log(JSON.stringify(github));
     console.log(JSON.stringify(pull_request));
@@ -99,14 +99,14 @@ async function waitJenkinsJob(jobName, timestamp) {
 }
 
 async function main() {
-    run();
+    githubSettings();
     try {
         let params;
         let startTs = +new Date();
         if (PARAMETERS) {
             params = _.merge({
                 'REPOSITORY': REPOSITORY,
-                'BRANCH': BRANCH
+                'BRANCH': branch
             }, JSON.parse(core.getInput('parameter')))
             params = JSON.parse(core.getInput('parameter'));
             core.info(`>>> Parameter ${params.toString()}`);

@@ -26207,14 +26207,14 @@ const PARAMETERS = _actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('paramete
 const WAIT = _actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('wait');
 const TIMEOUT = _actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('timeout');
 
-const REPOSITORY = _actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('repository');
-const BRANCH = _actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('branch') || 'main';
+let REPOSITORY = _actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('repository');
+let branch;
 
-function run() {
+function githubSettings() {
 
     console.log('RUN');
     console.log(REPOSITORY);
-    console.log(BRANCH);
+    console.log(branch);
 
 
     const {context = {}} = _actions_github__WEBPACK_IMPORTED_MODULE_4__;
@@ -26225,7 +26225,7 @@ function run() {
         throw new Error('Could not find pull request!');
     }
 
-    console.log(pull_request.head.ref);
+    branch = pull_request.head.ref;
 
     console.log(JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_4__));
     console.log(JSON.stringify(pull_request));
@@ -26292,14 +26292,14 @@ async function waitJenkinsJob(jobName, timestamp) {
 }
 
 async function main() {
-    run();
+    githubSettings();
     try {
         let params;
         let startTs = +new Date();
         if (PARAMETERS) {
             params = lodash__WEBPACK_IMPORTED_MODULE_2__.merge({
                 'REPOSITORY': REPOSITORY,
-                'BRANCH': BRANCH
+                'BRANCH': branch
             }, JSON.parse(_actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('parameter')))
             params = JSON.parse(_actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('parameter'));
             _actions_core__WEBPACK_IMPORTED_MODULE_3__.info(`>>> Parameter ${params.toString()}`);
