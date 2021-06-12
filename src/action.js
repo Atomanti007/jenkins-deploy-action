@@ -28,7 +28,8 @@ function run() {
     const {pull_request} = context.payload;
 
     if (!pull_request) {
-        throw new Error('Could not find pull request!')
+        core.setFailed('Could not find pull request!');
+        throw new Error('Could not find pull request!');
     }
 
     console.log(pull_request.head.ref);
