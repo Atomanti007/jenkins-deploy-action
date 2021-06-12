@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import axios from 'axios';
+import * as _ from 'lodash';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
@@ -7,8 +8,8 @@ dotenv.config();
 
 const USER = core.getInput('user_name');
 const TOKEN = core.getInput('api_token');
-const JENKINS_URL = core.getInput('jenkins_url');
 const JOB_NAME = core.getInput('job_name');
+const JENKINS_URL = core.getInput('jenkins_url') || 'http://prime-dev.storesync.io:30000';
 const PARAMETERS = core.getInput('parameter');
 const WAIT = core.getInput('wait');
 const TIMEOUT = core.getInput('timeout');
@@ -29,6 +30,8 @@ function run() {
     if (!pull_request) {
         throw new Error('Could not find pull request!')
     }
+
+    console.log(pull_request.head.ref);
 
     console.log(JSON.stringify(github));
     console.log(JSON.stringify(pull_request));
@@ -100,6 +103,10 @@ async function main() {
         let params;
         let startTs = +new Date();
         if (PARAMETERS) {
+            params = _.merge({
+                'REPOSITORY': REPOSITORY,
+                'BRANCH': BRANCH
+            }, JSON.parse(core.getInput('parameter')))
             params = JSON.parse(core.getInput('parameter'));
             core.info(`>>> Parameter ${params.toString()}`);
         }
