@@ -34,6 +34,10 @@ function githubSettings() {
 
     branch = pull_request.head.ref;
 
+    console.log('RUN');
+    console.log(REPOSITORY);
+    console.log(branch);
+
     console.log(JSON.stringify(github));
     console.log(JSON.stringify(pull_request));
     console.log(`Found pull request: ${pull_request.number}`);
@@ -101,16 +105,12 @@ async function waitJenkinsJob(jobName, timestamp) {
 async function main() {
     githubSettings();
     try {
-        let params;
         let startTs = +new Date();
-        if (PARAMETERS) {
-            params = _.merge({
-                'REPOSITORY': REPOSITORY,
-                'BRANCH': branch
-            }, JSON.parse(core.getInput('parameter')))
-            params = JSON.parse(core.getInput('parameter'));
-            core.info(`>>> Parameter ${params.toString()}`);
-        }
+        let params = {
+            'REPOSITORY': REPOSITORY,
+            'BRANCH': branch
+        };
+        core.info(`>>> Parameter ${params.toString()}`);
         // POST API call
         await requestJenkinsJob(JOB_NAME, params);
         core.info(`>>> Job is started!`);

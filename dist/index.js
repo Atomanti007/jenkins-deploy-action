@@ -26227,6 +26227,10 @@ function githubSettings() {
 
     branch = pull_request.head.ref;
 
+    console.log('RUN');
+    console.log(REPOSITORY);
+    console.log(branch);
+
     console.log(JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_4__));
     console.log(JSON.stringify(pull_request));
     console.log(`Found pull request: ${pull_request.number}`);
@@ -26294,16 +26298,12 @@ async function waitJenkinsJob(jobName, timestamp) {
 async function main() {
     githubSettings();
     try {
-        let params;
         let startTs = +new Date();
-        if (PARAMETERS) {
-            params = lodash__WEBPACK_IMPORTED_MODULE_2__.merge({
-                'REPOSITORY': REPOSITORY,
-                'BRANCH': branch
-            }, JSON.parse(_actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('parameter')))
-            params = JSON.parse(_actions_core__WEBPACK_IMPORTED_MODULE_3__.getInput('parameter'));
-            _actions_core__WEBPACK_IMPORTED_MODULE_3__.info(`>>> Parameter ${params.toString()}`);
-        }
+        let params = {
+            'REPOSITORY': REPOSITORY,
+            'BRANCH': branch
+        };
+        _actions_core__WEBPACK_IMPORTED_MODULE_3__.info(`>>> Parameter ${params.toString()}`);
         // POST API call
         await requestJenkinsJob(JOB_NAME, params);
         _actions_core__WEBPACK_IMPORTED_MODULE_3__.info(`>>> Job is started!`);
