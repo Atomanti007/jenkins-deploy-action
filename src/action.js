@@ -1,28 +1,34 @@
-require('dotenv').config();
-const fetch = require('node-fetch');
-const core = require('@actions/core');
-const github = require('@actions/github');
+import dotenv from 'dotenv'
+import axios from 'axios';
+import * as core from '@actions/core';
+import * as github from '@actions/github';
 
-async function run() {
-    const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
-    const TENOR_TOKEN = core.getInput('TENOR_TOKEN') || process.env.TENOR_TOKEN;
-    const message = core.getInput('message') || 'Thank you!';
-    const searchTerm = core.getInput('searchTerm') || 'thank you';
+dotenv.config();
 
-    const REPOSITORY = core.getInput('repository');
-    const BRANCH = core.getInput('branch') || 'master';
+const USER = core.getInput('user_name');
+const TOKEN = core.getInput('api_token');
+const JENKINS_URL = core.getInput('jenkins_url');
+const JOB_NAME = core.getInput('job_name');
+const PARAMETERS = core.getInput('parameter');
+const WAIT = core.getInput('wait');
+const TIMEOUT = core.getInput('timeout');
+
+const REPOSITORY = core.getInput('repository');
+const BRANCH = core.getInput('branch') || 'main';
+
+function run() {
 
     console.log('RUN');
     console.log(REPOSITORY);
     console.log(BRANCH);
 
 
-    const { context = {} } = github;
-    const { pull_request } = context.payload;
+    const {context = {}} = github;
+    const {pull_request} = context.payload;
 
-    if ( !pull_request ) {
+    if (!pull_request) {
         throw new Error('Could not find pull request!')
-    };
+    }
 
     console.log(JSON.stringify(github));
     console.log(JSON.stringify(pull_request));
@@ -30,4 +36,89 @@ async function run() {
 
 }
 
-run().catch(e => core.setFailed(e.message));
+
+const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');
+
+let timer = setTimeout(() => {
+    core.setFailed("Job Timeout");
+    core.error("Exception Error: Timed out");
+}, (Number(TIMEOUT) * 1000));
+
+const sleep = (seconds) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, (seconds * 1000));
+    });
+};
+
+async function requestJenkinsJob(jobName, params) {
+    let url = `${JENKINS_URL}/job/${jobName}/buildWithParameters`;
+    await axios({
+        method: 'POST',
+        url: url,
+        form: params,
+        headers: {
+            'Authorization': `Basic ${API_TOKEN}`
+        }
+    });
+}
+
+async function getJobStatus(jobName) {
+    const url = `${JENKINS_URL}/job/${jobName}/lastBuild/api/json`;
+    return axios.get(url, {
+            auth: {
+                username: USER,
+                password: TOKEN
+            }
+        }
+    )
+}
+
+async function waitJenkinsJob(jobName, timestamp) {
+    core.info(`>>> Waiting for "${jobName}" ...`);
+    while (true) {
+        let response = await getJobStatus(jobName);
+        let data = response.data;
+
+
+        if (data.timestamp < timestamp) {
+            core.info(`>>> Job is not started yet... Wait 5 seconds more...`)
+        } else if (data.result === "SUCCESS") {
+            core.info(`>>> Job "${data.fullDisplayName}" successfully completed!`);
+            break;
+        } else if (data.result === "FAILURE" || data.result === "ABORTED") {
+            throw new Error(`Failed job ${data.fullDisplayName}`);
+        } else if (data) {
+            core.info(`>>> Current Duration: ${data.duration}. Expected: ${data.estimatedDuration}`);
+        }
+        await sleep(5); // API call interval
+    }
+}
+
+async function main() {
+    run();
+    try {
+        let params;
+        let startTs = +new Date();
+        if (PARAMETERS) {
+            params = JSON.parse(core.getInput('parameter'));
+            core.info(`>>> Parameter ${params.toString()}`);
+        }
+        // POST API call
+        await requestJenkinsJob(JOB_NAME, params);
+        core.info(`>>> Job is started!`);
+
+        // Waiting for job completion
+        if (WAIT === 'true') {
+            await waitJenkinsJob(JOB_NAME, startTs);
+        }
+    } catch (err) {
+        console.log(`${JSON.stringify(err)}`)
+        core.setFailed(err.message);
+        core.error(err.message);
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+main().catch(e => core.setFailed(e.message));
