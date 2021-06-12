@@ -111,7 +111,7 @@ async function main() {
             'REPOSITORY': REPOSITORY,
             'BRANCH': branch
         };
-        core.info(`>>> Parameter ${params.toString()}`);
+        core.info(`>>> Parameter ${JSON.stringify(params)}`);
         // POST API call
         await requestJenkinsJob(JOB_NAME, params);
         core.info(`>>> Job is started!`);

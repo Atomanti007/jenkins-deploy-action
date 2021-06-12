@@ -28372,7 +28372,7 @@ async function main() {
             'REPOSITORY': REPOSITORY,
             'BRANCH': branch
         };
-        _actions_core__WEBPACK_IMPORTED_MODULE_4__.info(`>>> Parameter ${params.toString()}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_4__.info(`>>> Parameter ${JSON.stringify(params)}`);
         // POST API call
         await requestJenkinsJob(JOB_NAME, params);
         _actions_core__WEBPACK_IMPORTED_MODULE_4__.info(`>>> Job is started!`);
