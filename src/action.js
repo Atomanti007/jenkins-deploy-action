@@ -77,7 +77,6 @@ async function waitJenkinsJob(jobName, timestamp) {
 }
 
 async function main() {
-    console.log(github.context)
     try {
         let startTs = +new Date();
         let params = {

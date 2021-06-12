@@ -28338,7 +28338,6 @@ async function waitJenkinsJob(jobName, timestamp) {
 }
 
 async function main() {
-    console.log(_actions_github__WEBPACK_IMPORTED_MODULE_5__.context)
     try {
         let startTs = +new Date();
         let params = {
