@@ -111,7 +111,6 @@ async function main() {
             'BRANCH': branch
         };
         core.info(`>>> Parameter ${params.toString()}`);
-        return;
         // POST API call
         await requestJenkinsJob(JOB_NAME, params);
         core.info(`>>> Job is started!`);
