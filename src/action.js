@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import axios from 'axios';
+import qs from 'qs';
 import * as _ from 'lodash';
 import * as core from '@actions/core';
 import * as github from '@actions/github';
@@ -62,11 +63,10 @@ async function requestJenkinsJob(jobName, params) {
     let url = `${JENKINS_URL}/job/${jobName}/buildWithParameters`;
     await axios({
         method: 'POST',
-        url: url,
-        form: params,
         headers: {
             'Authorization': `Basic ${API_TOKEN}`
-        }
+        },
+        data : qs.stringify(params)
     });
 }
 
