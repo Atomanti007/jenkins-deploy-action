@@ -24,6 +24,7 @@ const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');
 let timer = setTimeout(() => {
     core.setFailed("Job Timeout");
     core.error("Exception Error: Timed out");
+    process.exit(1);
 }, (Number(TIMEOUT) * 1000));
 
 const sleep = (seconds) => {

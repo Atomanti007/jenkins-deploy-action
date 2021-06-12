@@ -28285,6 +28285,7 @@ const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');
 let timer = setTimeout(() => {
     _actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed("Job Timeout");
     _actions_core__WEBPACK_IMPORTED_MODULE_4__.error("Exception Error: Timed out");
+    process.exit(1);
 }, (Number(TIMEOUT) * 1000));
 
 const sleep = (seconds) => {
