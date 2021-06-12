@@ -23,9 +23,9 @@ inputs:
     required: false
     default: "true"
   timeout:
-    description: 'Timeout (seconds) for github action. Set 600s as default'
+    description: 'Timeout (seconds) for github action. Set 300s as default'
     required: false
-    default: "60"
+    default: "300"
   repository:
     description: 'Repository name with owner. For example, actions/checkout'
     default: ${{ github.repository }}
