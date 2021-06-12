@@ -31,7 +31,7 @@ inputs:
     description: 'Repository name with owner. For example, actions/checkout'
     default: ${{ github.repository }}
     required: false
-  brach:
+  branch:
     description: 'Branch name'
     default: ${{ github.ref }}
     required: false
