@@ -1,0 +1,40 @@
+name: 'Thank You Action'
+description: 'Say "Thank You" to new pull requests'
+author: 'Kulifay Zsolt'
+
+inputs:
+  user_name:
+    description: 'User name of Jenkins'
+    required: true
+  api_token:
+    description: 'Jenkins API token'
+    required: true
+  job_name:
+    description: 'Job name'
+    required: true
+  jenkins_url:
+    description: 'Jenkins url'
+    required: true
+  parameter:
+    description: 'Job parameter in JSON format. ex {"param1":"value1"}'
+    required: false
+  wait:
+    description: 'Waiting for job completion or not'
+    required: false
+    default: "true"
+  timeout:
+    description: 'Timeout (seconds) for github action. Set 600s as default'
+    required: false
+    default: "60"
+  repository:
+    description: 'Repository name with owner. For example, actions/checkout'
+    default: ${{ github.repository }}
+    required: false
+  branch:
+    description: 'Branch name'
+    default: ${{ github.ref }}
+    required: false
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
