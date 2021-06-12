@@ -16,7 +16,7 @@ const WAIT = core.getInput('wait');
 const TIMEOUT = core.getInput('timeout');
 
 let REPOSITORY = core.getInput('repository').substring(core.getInput('repository').indexOf("/") + 1);
-let BRANCH = core.getInput('branch');
+let BRANCH = core.getInput('branch') || 'main';
 
 
 const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');

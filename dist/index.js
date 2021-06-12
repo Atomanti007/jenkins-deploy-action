@@ -28277,7 +28277,7 @@ const WAIT = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('wait');
 const TIMEOUT = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('timeout');
 
 let REPOSITORY = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('repository').substring(_actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('repository').indexOf("/") + 1);
-let BRANCH = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('branch');
+let BRANCH = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('branch') || 'main';
 
 
 const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');
