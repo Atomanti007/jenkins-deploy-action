@@ -26304,6 +26304,7 @@ async function main() {
             'BRANCH': branch
         };
         _actions_core__WEBPACK_IMPORTED_MODULE_3__.info(`>>> Parameter ${params.toString()}`);
+        return;
         // POST API call
         await requestJenkinsJob(JOB_NAME, params);
         _actions_core__WEBPACK_IMPORTED_MODULE_3__.info(`>>> Job is started!`);
