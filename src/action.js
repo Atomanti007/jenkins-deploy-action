@@ -15,7 +15,7 @@ const PARAMETERS = core.getInput('parameter');
 const WAIT = core.getInput('wait');
 const TIMEOUT = core.getInput('timeout');
 
-let REPOSITORY = core.getInput('repository');
+let REPOSITORY = core.getInput('repository').substring(core.getInput('repository').indexOf("/") + 1);
 let BRANCH = core.getInput('branch');
 
 
