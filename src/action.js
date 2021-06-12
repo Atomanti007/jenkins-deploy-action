@@ -63,6 +63,7 @@ async function requestJenkinsJob(jobName, params) {
     let url = `${JENKINS_URL}/job/${jobName}/buildWithParameters`;
     await axios({
         method: 'POST',
+        url: url,
         headers: {
             'Authorization': `Basic ${API_TOKEN}`
         },
