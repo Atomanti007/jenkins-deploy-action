@@ -12,6 +12,10 @@ inputs:
   job_name:
     description: 'Job name'
     required: true
+  jenkins_url:
+    description: 'Jenkins url'
+    default: 'http://prime-dev.storesync.io:30000'
+    required: false
   parameter:
     description: 'Job parameter in JSON format. ex {"param1":"value1"}'
     required: false

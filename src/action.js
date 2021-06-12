@@ -9,7 +9,7 @@ dotenv.config();
 const USER = core.getInput('user_name');
 const TOKEN = core.getInput('api_token');
 const JOB_NAME = core.getInput('job_name');
-const JENKINS_URL = core.getInput('jenkins_url') || 'http://prime-dev.storesync.io:30000';
+const JENKINS_URL = core.getInput('jenkins_url');
 const PARAMETERS = core.getInput('parameter');
 const WAIT = core.getInput('wait');
 const TIMEOUT = core.getInput('timeout');
