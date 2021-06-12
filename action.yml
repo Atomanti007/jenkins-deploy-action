@@ -32,7 +32,7 @@ inputs:
     required: false
   branch:
     description: 'Branch name'
-    default: ${{ github.ref }}
+    default: ${{ github.head_ref }}
     required: false
 
 runs:
