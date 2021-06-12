@@ -16,34 +16,7 @@ const WAIT = core.getInput('wait');
 const TIMEOUT = core.getInput('timeout');
 
 let REPOSITORY = core.getInput('repository');
-let branch;
-
-function githubSettings() {
-
-    console.log('RUN');
-    console.log(REPOSITORY);
-    console.log(branch);
-
-
-    const {context = {}} = github;
-    const {pull_request} = context.payload;
-
-    if (!pull_request) {
-        core.setFailed('Could not find pull request!');
-        throw new Error('Could not find pull request!');
-    }
-
-    branch = pull_request.head.ref;
-
-    console.log('RUN');
-    console.log(REPOSITORY);
-    console.log(branch);
-
-    console.log(JSON.stringify(github));
-    console.log(JSON.stringify(pull_request));
-    console.log(`Found pull request: ${pull_request.number}`);
-
-}
+let BRANCH = core.getInput('branch');
 
 
 const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');
@@ -104,12 +77,11 @@ async function waitJenkinsJob(jobName, timestamp) {
 }
 
 async function main() {
-    githubSettings();
     try {
         let startTs = +new Date();
         let params = {
             'REPOSITORY': REPOSITORY,
-            'BRANCH': branch
+            'BRANCH': BRANCH
         };
         core.info(`>>> Parameter ${JSON.stringify(params)}`);
         // POST API call

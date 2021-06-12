@@ -28277,34 +28277,7 @@ const WAIT = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('wait');
 const TIMEOUT = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('timeout');
 
 let REPOSITORY = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('repository');
-let branch;
-
-function githubSettings() {
-
-    console.log('RUN');
-    console.log(REPOSITORY);
-    console.log(branch);
-
-
-    const {context = {}} = _actions_github__WEBPACK_IMPORTED_MODULE_5__;
-    const {pull_request} = context.payload;
-
-    if (!pull_request) {
-        _actions_core__WEBPACK_IMPORTED_MODULE_4__.setFailed('Could not find pull request!');
-        throw new Error('Could not find pull request!');
-    }
-
-    branch = pull_request.head.ref;
-
-    console.log('RUN');
-    console.log(REPOSITORY);
-    console.log(branch);
-
-    console.log(JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_5__));
-    console.log(JSON.stringify(pull_request));
-    console.log(`Found pull request: ${pull_request.number}`);
-
-}
+let BRANCH = _actions_core__WEBPACK_IMPORTED_MODULE_4__.getInput('branch');
 
 
 const API_TOKEN = Buffer.from(`${USER}:${TOKEN}`).toString('base64');
@@ -28365,12 +28338,11 @@ async function waitJenkinsJob(jobName, timestamp) {
 }
 
 async function main() {
-    githubSettings();
     try {
         let startTs = +new Date();
         let params = {
             'REPOSITORY': REPOSITORY,
-            'BRANCH': branch
+            'BRANCH': BRANCH
         };
         _actions_core__WEBPACK_IMPORTED_MODULE_4__.info(`>>> Parameter ${JSON.stringify(params)}`);
         // POST API call

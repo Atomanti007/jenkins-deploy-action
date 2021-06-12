@@ -31,6 +31,10 @@ inputs:
     description: 'Repository name with owner. For example, actions/checkout'
     default: ${{ github.repository }}
     required: false
+  brach:
+    description: 'Branch name'
+    default: ${{ github.ref }}
+    required: false
 
 runs:
   using: 'node12'
