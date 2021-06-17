@@ -1,9 +1,7 @@
 import dotenv from 'dotenv'
 import axios from 'axios';
 import qs from 'qs';
-import * as _ from 'lodash';
 import * as core from '@actions/core';
-import * as github from '@actions/github';
 
 dotenv.config();
 
@@ -93,6 +91,8 @@ async function main() {
         if (WAIT === 'true') {
             await waitJenkinsJob(JOB_NAME, startTs);
         }
+
+        core.info(`>>> Job is finished!`);
     } catch (err) {
         console.log(`${JSON.stringify(err)}`)
         core.setFailed(err.message);
